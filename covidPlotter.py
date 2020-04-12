@@ -60,6 +60,6 @@ def plot_bar(array,country,ylabel=''):
 def plot_bar_active(array,country,ylabel=''): 
     plt.figure()
     plt.bar(list(range(len(array))), array,label=country)
-    plt.xlabel("Days Since 100th Confirmed Case")
+    plt.xlabel("Days")
     plt.ylabel(ylabel)
     plt.legend()

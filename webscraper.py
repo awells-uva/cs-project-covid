@@ -45,6 +45,7 @@ def webscrape_population_2020():
         entry = row[1:]
         entry[1] = entry[1].replace(',', '')
         entry[3] = entry[3].replace(',', '')
+        entry[4] = entry[4].replace(',', '')
         entry[5] = entry[5].replace(',', '')
         entry[6] = entry[6].replace(',', '')
 
