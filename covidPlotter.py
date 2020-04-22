@@ -63,3 +63,66 @@ def plot_bar_active(array,country,ylabel=''):
     plt.xlabel("Days")
     plt.ylabel(ylabel)
     plt.legend()
+
+def plot_multi_countries(unique_countries, population, df_subset, yaxis = 'Confirmed'):
+    data = {}
+    try:
+        for country in unique_countries:
+            xPopulation = int(population[population['country']==country]['population'])
+            xPopDen = int(population[population['country']==country]['denstity(P/Km2)'])
+
+            dates = df_subset.columns[4:]
+
+            data[country]={}
+            for date in dates:
+                confirmed_day = int(df_subset[df_subset["Country/Region"] ==country][date])
+                confirmed_to_pop_ratio = float(confirmed_day/xPopulation)
+                confirmed_to_popDen_ratio = float(confirmed_day/xPopDen)
+
+                data[country][date] = [confirmed_day,
+                                   confirmed_to_pop_ratio,
+                                   confirmed_to_popDen_ratio]
+
+    except:
+        print("Cannot Process: {}".format(country))
+
+    if yaxis.lower() == 'confirmed':
+        index = 0
+        yaxislabel = "Confirmed"
+        
+    elif yaxis.lower() == 'population':
+        index = 1
+        yaxislabel = "Confirmed/Population"
+
+    elif yaxis.lower() == 'density':
+        index = 2
+        yaxislabel = "Confirmed/Pop. Density"
+    else:
+        raise ValueError('No Reference for: {}'.format(yaxislabel))
+        
+    tmp = {}
+    for xCountry in list(data.keys()):
+        country_dates = list(data[xCountry].keys())
+        x = []
+        y = []
+        for country_date in country_dates:
+            x_value = datetime.datetime.strptime(country_date,"%m/%d/%y").date()
+            y_value = data[xCountry][country_date][index]
+            x.append(x_value)
+            y.append(y_value)
+        x, y = (list(t) for t in zip(*sorted(zip(x, y))))
+        tmp[xCountry] = [x,y]
+    plt.figure()
+    ax = plt.gca()
+    formatter = mdates.DateFormatter("%Y-%m-%d")
+    ax.xaxis.set_major_formatter(formatter)
+    locator = mdates.DayLocator()
+    ax.xaxis.set_major_locator(locator)
+    ax.xaxis.set_major_locator(plt.MaxNLocator(5))
+    for key in list(tmp.keys()):
+        plt.plot(tmp[key][0], tmp[key][1],label=key)
+    plt.xlabel('Date')
+    plt.ylabel(yaxislabel)
+    plt.title("Date vs {}".format(yaxislabel))
+    plt.legend()
+    plt.show()

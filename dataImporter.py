@@ -14,3 +14,22 @@ def get_cases_confirmed_as_lists(dataframe):
     new_cases_per_day.insert(0,cases_per_day[0]) #Add how many it was on day 1
     
     return local_dates, cases_per_day, new_cases_per_day
+
+
+def get_latest_subset(dataframe, baseline):
+    import datetime
+    df  = dataframe.groupby(['Country/Region']).sum().reset_index()
+    
+    try:
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        yesterday = '{}{}'.format(yesterday.month,yesterday.strftime('/%d/%y'))
+        df_subset = df[df[yesterday] > baseline ]
+
+    except:
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=2)
+        yesterday = '{}{}'.format(yesterday.month,yesterday.strftime('/%d/%y'))
+        df_subset = df[df[yesterday] > baseline ]
+      
+    return df_subset, yesterday
