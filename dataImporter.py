@@ -37,6 +37,7 @@ def get_latest_subset(dataframe, baseline):
 
 def kmean_analysis(DataFrame, population, plotAllPop = True, n_clusters = 6 , removeOutliers = False, yaxis='population' ):
     from sklearn.cluster import KMeans
+    import pandas
 
     dataframe = DataFrame.groupby(['Country/Region']).sum().reset_index()
     x = []
