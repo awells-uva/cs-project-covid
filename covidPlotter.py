@@ -69,7 +69,7 @@ def plot_multi_countries(unique_countries, population, df_subset, yaxis = 'Confi
     try:
         for country in unique_countries:
             xPopulation = int(population[population['country']==country]['population'])
-            xPopDen = int(population[population['country']==country]['denstity(P/Km2)'])
+            xPopDen = int(population[population['country']==country]['density(P/Km2)'])
 
             dates = df_subset.columns[4:]
 

@@ -33,3 +33,40 @@ def get_latest_subset(dataframe, baseline):
         df_subset = df[df[yesterday] > baseline ]
       
     return df_subset, yesterday
+
+
+def kmean_analysis(DataFrame, population, plotAllPop = True, n_clusters = 6 , removeOutliers = False, yaxis='population' ):
+    from sklearn.cluster import KMeans
+
+    dataframe = DataFrame.groupby(['Country/Region']).sum().reset_index()
+    x = []
+    y = []
+    labels = []
+    for index, row in dataframe.iterrows():
+        for index_pop, row_pop in population.iterrows():
+            if row_pop['country'] == row['Country/Region']:
+                # ToDO:
+                if not plotAllPop:
+                    if row[-1] < baseline: # If number of Confirmed Cases < baseline
+                        continue
+                if yaxis.lower() == 'population':
+                    x.append(int(row_pop['population']))
+                if yaxis.lower() == 'density':
+                    x.append(int(row_pop['density(P/Km2)']))
+                y.append(int(row[-1]))
+                labels.append(row['Country/Region'])
+                break
+    if yaxis.lower() == 'population':
+        outframe = pandas.DataFrame({'population': x, 'confirmed':y},columns=['population','confirmed'])
+    if yaxis.lower() == 'density':
+        outframe = pandas.DataFrame({'density(P/Km2)': x, 'confirmed':y},columns=['density(P/Km2)','confirmed'])
+
+
+    kmeans = KMeans(n_clusters=n_clusters).fit(outframe)
+    centroids = kmeans.cluster_centers_
+
+    outframe['country'] = labels
+    outframe['cluster'] = kmeans.labels_.astype(float)
+
+    return outframe, centroids
+

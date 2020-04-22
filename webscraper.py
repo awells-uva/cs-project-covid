@@ -32,7 +32,7 @@ def webscrape_population_2020():
     page = requests.get(url).text
     soup = BeautifulSoup(page, 'html.parser')
 
-    headers = ["country", "population", "yearlyChange","netChange","denstity(P/Km2)","landArea(km2)", "migrants", "fertRate","medAge", "urbanPop","worldShare"]
+    headers = ["country", "population", "yearlyChange","netChange","density(P/Km2)","landArea(km2)", "migrants", "fertRate","medAge", "urbanPop","worldShare"]
     table = soup.find('table')
     table_rows = table.find_all('tr')
     frame = []
