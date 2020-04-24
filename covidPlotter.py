@@ -123,7 +123,6 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
         if index == 0:
             for key in list(tmp.keys()):
                 array = [i for i in tmp[key][1] if i >= 100]
-                print(len(array))
                 plt.plot(list(range(len(array))), array,label=key)
                 
         if index == 1 or index == 2:
@@ -136,7 +135,6 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
                     if y_value >= 100:
                         counter = counter + 1
                 array = tmp[xCountry][1][-counter:]
-                print(len(array))
                 plt.plot(list(range(len(array))), array,label=xCountry)
                 
         plt.xlabel('Days Since 100th Confirmed Case')
