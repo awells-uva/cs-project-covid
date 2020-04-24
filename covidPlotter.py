@@ -64,7 +64,7 @@ def plot_bar_active(array,country,ylabel=''):
     plt.ylabel(ylabel)
     plt.legend()
 
-def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confirmed'):
+def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confirmed', daySince = False):
     data = {}
     can_not_plot = 0
     df_subset = dataframe.groupby(['Country/Region']).sum().reset_index()
@@ -84,7 +84,6 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
                                    confirmed_to_pop_ratio,
                                    confirmed_to_popDen_ratio]
                                    
-
         except:
             can_not_plot = can_not_plot + 1
             print("Cannot Process: {}".format(country))
@@ -118,17 +117,48 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
             y.append(y_value)
         x, y = (list(t) for t in zip(*sorted(zip(x, y))))
         tmp[xCountry] = [x,y]
-    plt.figure()
-    ax = plt.gca()
-    formatter = mdates.DateFormatter("%Y-%m-%d")
-    ax.xaxis.set_major_formatter(formatter)
-    locator = mdates.DayLocator()
-    ax.xaxis.set_major_locator(locator)
-    ax.xaxis.set_major_locator(plt.MaxNLocator(5))
-    for key in list(tmp.keys()):
-        plt.plot(tmp[key][0], tmp[key][1],label=key)
-    plt.xlabel('Date')
-    plt.ylabel(yaxislabel)
-    plt.title("Date vs {}".format(yaxislabel))
-    plt.legend()
+    
+    if daySince:
+        plt.figure()
+        if index == 0:
+            for key in list(tmp.keys()):
+                array = [i for i in tmp[key][1] if i >= 100]
+                print(len(array))
+                plt.plot(list(range(len(array))), array,label=key)
+                
+        if index == 1 or index == 2:
+            
+            for xCountry in list(data.keys()):
+                counter = 0
+                country_dates = list(data[xCountry].keys())
+                for country_date in country_dates:
+                    y_value = data[xCountry][country_date][0]
+                    if y_value >= 100:
+                        counter = counter + 1
+                array = tmp[xCountry][1][-counter:]
+                print(len(array))
+                plt.plot(list(range(len(array))), array,label=xCountry)
+                
+        plt.xlabel('Days Since 100th Confirmed Case')
+        plt.ylabel(yaxislabel)
+        plt.title("Days Since 100th Confirmed Case vs {}".format(yaxislabel))
+        plt.legend()
+        
+    if not daySince:
+        plt.figure()
+        ax = plt.gca()
+        formatter = mdates.DateFormatter("%Y-%m-%d")
+        ax.xaxis.set_major_formatter(formatter)
+        locator = mdates.DayLocator()
+        ax.xaxis.set_major_locator(locator)
+        ax.xaxis.set_major_locator(plt.MaxNLocator(5))
+        for key in list(tmp.keys()):
+            plt.plot(tmp[key][0], tmp[key][1],label=key)
+
+        plt.xlabel('Date')
+        plt.ylabel(yaxislabel)
+        plt.title("Date vs {}".format(yaxislabel))
+        plt.legend()
+        
     plt.show()
+
