@@ -52,5 +52,13 @@ def webscrape_population_2020():
 
         frame.append(entry)
 
-    df = pandas.DataFrame(frame, columns = headers) 
+    df = pandas.DataFrame(frame, columns = headers)
+    df.country[df.country == 'United States']  = 'US'
+    df.country[df.country == 'Taiwan']  = 'Taiwan*'
+    df.country[df.country == 'South Korea']  = 'Korea, South'
+    df.country[df.country == "Côte d'Ivoire"]  = "Cote d'Ivoire"
+    df.country[df.country == "Czech Republic (Czechia)"]  = "Czechia"
+    df.country[df.country == 'St. Vincent & Grenadines']  = 'Saint Vincent and the Grenadines'
+    df.country[df.country == 'Saint Kitts & Nevis']  = 'Saint Kitts and Nevis'
+    df.country[df.country == 'Sao Tome & Principe']  = 'Sao Tome and Principe'
     return df 

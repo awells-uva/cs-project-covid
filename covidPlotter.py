@@ -64,15 +64,16 @@ def plot_bar_active(array,country,ylabel=''):
     plt.ylabel(ylabel)
     plt.legend()
 
-def plot_multi_countries(unique_countries, population, df_subset, yaxis = 'Confirmed'):
+def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confirmed'):
     data = {}
-    try:
-        for country in unique_countries:
+    can_not_plot = 0
+    df_subset = dataframe.groupby(['Country/Region']).sum().reset_index()
+    for country in unique_countries:
+        try:
             xPopulation = int(population[population['country']==country]['population'])
             xPopDen = int(population[population['country']==country]['density(P/Km2)'])
 
             dates = df_subset.columns[4:]
-
             data[country]={}
             for date in dates:
                 confirmed_day = int(df_subset[df_subset["Country/Region"] ==country][date])
@@ -82,10 +83,15 @@ def plot_multi_countries(unique_countries, population, df_subset, yaxis = 'Confi
                 data[country][date] = [confirmed_day,
                                    confirmed_to_pop_ratio,
                                    confirmed_to_popDen_ratio]
+                                   
 
-    except:
-        print("Cannot Process: {}".format(country))
-
+        except:
+            can_not_plot = can_not_plot + 1
+            print("Cannot Process: {}".format(country))
+    
+    if can_not_plot == len(unique_countries):
+        return False
+        
     if yaxis.lower() == 'confirmed':
         index = 0
         yaxislabel = "Confirmed"
@@ -98,7 +104,7 @@ def plot_multi_countries(unique_countries, population, df_subset, yaxis = 'Confi
         index = 2
         yaxislabel = "Confirmed/Pop. Density"
     else:
-        raise ValueError('No Reference for: {}'.format(yaxislabel))
+        raise ValueError('No Reference for: {}'.format(yaxis))
         
     tmp = {}
     for xCountry in list(data.keys()):
