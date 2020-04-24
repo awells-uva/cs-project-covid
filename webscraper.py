@@ -18,9 +18,10 @@ def webscrape(datapath,url,ext, verbose=False):
                 print("Downloading: {}".format(csvfile))
             if not os.path.isdir(datapath):
                 os.makedirs(datapath)
+            ### This produces a ResourceWarning: unclosed file <_io.BufferedWriter Warning. should be corrected but it's just a warning
             response = requests.get(rawurl+'/'+csvfile)
             open(datapath + "/" + csvfile, 'wb').write(response.content)
-
+            
     print("Data is Stored in: {}".format(datapath + "/"))
 
 def webscrape_population_2020():
