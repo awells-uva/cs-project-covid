@@ -8,8 +8,8 @@ def get_cases_confirmed_as_lists(dataframe):
     local_dates = []
     cases_per_day = []
     new_cases_per_day = []
-    local_dates = dataframe.columns[4:]
-    cases_per_day = dataframe.values[0][4:].tolist()
+    local_dates = dataframe.columns[3:]
+    cases_per_day = dataframe.values[0][3:].tolist()
     new_cases_per_day = [cases_per_day[i] - cases_per_day[i-1] for i in range(1,len(cases_per_day))]
     new_cases_per_day.insert(0,cases_per_day[0]) #Add how many it was on day 1
     
