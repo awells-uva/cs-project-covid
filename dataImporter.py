@@ -1,9 +1,32 @@
 def subset_country(dataframe, country):
+    """
+    Inputs
+        dataframe: pandas dataframe of all covid data
+        country: country ( as string ) of the country you want to subset out
+        
+    Summary
+        Subset a smaller dataframe of country data from larger dataframe
+        
+    Return
+        pandas dataframe of a subset country
+    """
 
     outframe = dataframe[dataframe['Country/Region'] == country]
     return outframe
 
 def get_cases_confirmed_as_lists(dataframe):
+    """
+    Inputs
+        dataframe: pandas dataframe of covid data
+        
+    Summary
+        Set various columns/columns as lists
+        
+    Return
+        local_dates: list of dates from columns
+        cases_per_day: list of number of cases per unit date
+        new_cases_per_day: list of deltas of cases_per_day(date) - cases_per_day(date - 1)
+    """
     dataframe = dataframe.groupby(['Country/Region']).sum().reset_index()
     local_dates = []
     cases_per_day = []
@@ -17,6 +40,18 @@ def get_cases_confirmed_as_lists(dataframe):
 
 
 def get_latest_subset(dataframe, baseline):
+    """
+    Inputs
+        dataframe: pandas dataframe of covid data
+        baseline: int - threshold of covid cases you want to subset dataframe
+        
+    Summary
+        Get the latest data cases as a dataframe
+        
+    Return
+        Yesterday: str - Reference Date the dataframe fetched
+        df_subset: pandas dataframe of last days confirmed cases
+    """
     import datetime
     df  = dataframe.groupby(['Country/Region']).sum().reset_index()
     
@@ -35,7 +70,28 @@ def get_latest_subset(dataframe, baseline):
     return df_subset, yesterday
 
 
-def kmean_analysis(DataFrame, population, plotAllPop = True, n_clusters = 6 , removeOutliers = False, yaxis='population' ):
+def kmean_analysis(DataFrame, population, plotAllPop = True, n_clusters = 6 , removeOutliers = False, yaxis='population'):
+    """
+        -- Future Development --
+    Input
+        DataFrame: pandas dataframe of all covid data
+        population: pandas dataframe of population data
+        plotAllPop: Boolean to plot all points( including outliers) True: Yes/ False: No default(True)
+        n_clusters: int - Number of Clusters for Kmeans analysis default(6)
+        removeOutliers: Remove outliers before analysis True: Yes / False: No default( False )
+        yaxis='population': str -  What Y axis variable for Kmeans analysis
+            'population' for population
+            'density' for population density
+            default(population)
+        
+    Summary
+        Kmeans Analysis
+        
+    Return
+        outframe: pandas dataframe
+        centroids: centroids of clusters from Kmeans analysis
+    """
+    
     from sklearn.cluster import KMeans
     import pandas
 
@@ -46,10 +102,10 @@ def kmean_analysis(DataFrame, population, plotAllPop = True, n_clusters = 6 , re
     for index, row in dataframe.iterrows():
         for index_pop, row_pop in population.iterrows():
             if row_pop['country'] == row['Country/Region']:
-                # ToDO:
-                if not plotAllPop:
-                    if row[-1] < baseline: # If number of Confirmed Cases < baseline
-                        continue
+                # ToDo: pass baseline to function
+                #if not plotAllPop:
+                #    if row[-1] < baseline: # If number of Confirmed Cases < baseline
+                #        continue
                 if yaxis.lower() == 'population':
                     x.append(int(row_pop['population']))
                 if yaxis.lower() == 'density':

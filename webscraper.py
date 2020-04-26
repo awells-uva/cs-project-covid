@@ -10,6 +10,18 @@ def listFD(url, ext=''):
     return [url + '/' + node.get('href') for node in soup.find_all('a') if node.get('href').endswith(ext)]
 
 def webscrape(datapath,url,ext, verbose=False):
+    """
+    Inputs
+        datapath: location on disk to store downloaded data
+        url: url to github page
+        ext: file extension of files on github to download
+        
+    Summary
+        Fetches datafiles from github
+    
+    Returns
+        None
+    """
     for filename in listFD(url, ext):
         if filename.endswith(".csv"):
 
@@ -26,6 +38,16 @@ def webscrape(datapath,url,ext, verbose=False):
     print("Data is Stored in: {}".format(datapath + "/"))
 
 def webscrape_population_2020():
+    """
+    Inputs
+        None
+        
+    Summary
+        Webscrapes a table of 2020 Country level population Data
+        
+    Returns
+        pandas dataframe
+    """
     from bs4 import BeautifulSoup
     import requests
     import pandas
@@ -44,6 +66,7 @@ def webscrape_population_2020():
         if len(row) == 0:
             continue
         ## Clean Data
+        # Remove commas from numerical columns
         entry = row[1:]
         entry[1] = entry[1].replace(',', '')
         entry[3] = entry[3].replace(',', '')
@@ -53,6 +76,7 @@ def webscrape_population_2020():
 
         frame.append(entry)
 
+    # Update frame to match country names
     df = pandas.DataFrame(frame, columns = headers)
     df.country[df.country == 'United States']  = 'US'
     df.country[df.country == 'Taiwan']  = 'Taiwan*'
@@ -62,4 +86,6 @@ def webscrape_population_2020():
     df.country[df.country == 'St. Vincent & Grenadines']  = 'Saint Vincent and the Grenadines'
     df.country[df.country == 'Saint Kitts & Nevis']  = 'Saint Kitts and Nevis'
     df.country[df.country == 'Sao Tome & Principe']  = 'Sao Tome and Principe'
+    
+    # Return Pandas dataframe
     return df 
