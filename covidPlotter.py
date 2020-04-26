@@ -20,8 +20,8 @@ def plot_country_cases(dataframe,country,state=''):
     #  Group Covid Data
     dataframe = dataframe.groupby(['Country/Region']).sum().reset_index()
     
-    dates = dataframe.columns[4:]
-    cases_per_day = dataframe.values[0][4:]
+    dates = dataframe.columns[3:]
+    cases_per_day = dataframe.values[0][3:]
     
     plt.figure()
     
@@ -58,8 +58,8 @@ def plot_country_confirmed_cases_index(dataframe,country, expGraph = False):
         
     """
     dataframe = dataframe.groupby(['Country/Region']).sum().reset_index()
-    dates = dataframe.columns[4:]
-    cases_per_day = dataframe.values[0][4:]
+    dates = dataframe.columns[3:]
+    cases_per_day = dataframe.values[0][3:]
     res = next((i for i, j in enumerate(cases_per_day) if j), None) # Finds Where the first day is non-zero
     cases = [i for i in cases_per_day[res:] if i >= 100]
     days_since_outbreak = list(range(0, len(cases)))
@@ -136,7 +136,7 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
             xPopulation = int(population[population['country']==country]['population'])
             xPopDen = int(population[population['country']==country]['density(P/Km2)'])
 
-            dates = df_subset.columns[4:]
+            dates = df_subset.columns[3:]
             data[country]={}
             for date in dates:
                 confirmed_day = int(df_subset[df_subset["Country/Region"] ==country][date])
