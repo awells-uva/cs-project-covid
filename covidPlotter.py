@@ -4,36 +4,63 @@ import matplotlib.dates as mdates
 import numpy
 
 def plot_country_cases(dataframe,country,state=''):
+    """
+    Input
+        dataframe: pandas dataframe of all covid data
+        country: country ( as string ) of the country you want to subset out
+        state: String to add to ylabel
+        
+    Summary
+        Plot Date vs (Confirmed / Recovered / Death)
+        
+    Return
+        Generate Plot, no return
+        
+    """
+    #  Group Covid Data
     dataframe = dataframe.groupby(['Country/Region']).sum().reset_index()
     
     dates = dataframe.columns[4:]
     cases_per_day = dataframe.values[0][4:]
     
     plt.figure()
+    
+    # Convert datestrings to datetime objects
     x_values = [datetime.datetime.strptime(d,"%m/%d/%y").date() for d in dates]
     ax = plt.gca()
 
+    #Format Date Axis for datetime objects
     formatter = mdates.DateFormatter("%Y-%m-%d")
-
     ax.xaxis.set_major_formatter(formatter)
-
     locator = mdates.DayLocator()
-
     ax.xaxis.set_major_locator(locator)
     ax.xaxis.set_major_locator(plt.MaxNLocator(5))
 
+    # Plot
     plt.plot(x_values, cases_per_day)
 
+    # Set Labels
     plt.ylabel('{} {} Cases'.format(country, state))
     plt.xlabel('Date')
     
 def plot_country_confirmed_cases_index(dataframe,country, expGraph = False):
+    """
+    Input
+        dataframe: pandas dataframe of all covid data
+        country: country ( as string ) of the country you want to subset out
+        expGraph: Boolean to plot a simple e^x graph True: Yes / False: No default( False )
+        
+    Summary
+        Index days since 100th case vs (Confirmed / Recovered / Death)
+        
+    Return
+        Generate Plot, no return
+        
+    """
     dataframe = dataframe.groupby(['Country/Region']).sum().reset_index()
     dates = dataframe.columns[4:]
     cases_per_day = dataframe.values[0][4:]
     res = next((i for i, j in enumerate(cases_per_day) if j), None) # Finds Where the first day is non-zero
-    #cases = cases_per_day[res:]
-    #cases = numpy.insert(cases,0,0)
     cases = [i for i in cases_per_day[res:] if i >= 100]
     days_since_outbreak = list(range(0, len(cases)))
     plt.figure()
@@ -49,7 +76,18 @@ def plot_country_confirmed_cases_index(dataframe,country, expGraph = False):
     plt.ylabel('{} Confirmed Cases'.format(country))
     plt.legend()
     
-def plot_bar(array,country,ylabel=''): 
+def plot_bar(array,country,ylabel=''):
+    """
+    Input
+        array: list of values to barplot
+        country: label for legend
+        ylabel: label for y-axis of plot
+    Summary
+        barplot of Days Since 100th Confirmed Case
+        
+    Return
+        Generate Plot, no return
+    """
     plt.figure()
     array = [i for i in array if i >= 100]
     plt.bar(list(range(len(array))), array,label=country)
@@ -57,7 +95,18 @@ def plot_bar(array,country,ylabel=''):
     plt.ylabel(ylabel)
     plt.legend()
     
-def plot_bar_active(array,country,ylabel=''): 
+def plot_bar_active(array,country,ylabel=''):
+    """
+    Input
+        array: list of values to barplot
+        country: label for legend
+        ylabel: label for y-axis of plot
+    Summary
+        barplot of Days
+        
+    Return
+        Generate Plot, no return
+    """
     plt.figure()
     plt.bar(list(range(len(array))), array,label=country)
     plt.xlabel("Days")
@@ -65,6 +114,20 @@ def plot_bar_active(array,country,ylabel=''):
     plt.legend()
 
 def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confirmed', daySince = False):
+    """
+    Input
+        unique_countries: List of strings - Array of unique countries to plot
+        population: pandas dataframe of population data
+        dataframe: pandas data frame
+        yaxis = 'Confirmed': Y axis of plotting ( confirmed / population / density )
+        daySince = False Boolean - True: Plot X-axis as Index since 100th case
+                                   False: Plot X-Axis Dates
+    Summary
+        Plot (Date / Days Since 100th Case) vs (confirmed / population / density)
+
+    Return
+        Generate Plot, no return
+    """
     data = {}
     can_not_plot = 0
     df_subset = dataframe.groupby(['Country/Region']).sum().reset_index()
@@ -87,10 +150,12 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
         except:
             can_not_plot = can_not_plot + 1
             print("Cannot Process: {}".format(country))
-    
+            
+    # If no unique_countries to plot , exit
     if can_not_plot == len(unique_countries):
         return False
-        
+    
+    # If unknown value of y-axis, raise ValueError, else set y-axis
     if yaxis.lower() == 'confirmed':
         index = 0
         yaxislabel = "Confirmed"
@@ -111,10 +176,12 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
         x = []
         y = []
         for country_date in country_dates:
+            # Convert datestrings to datetime objects
             x_value = datetime.datetime.strptime(country_date,"%m/%d/%y").date()
             y_value = data[xCountry][country_date][index]
             x.append(x_value)
             y.append(y_value)
+        # Sort By Date
         x, y = (list(t) for t in zip(*sorted(zip(x, y))))
         tmp[xCountry] = [x,y]
     
@@ -125,6 +192,7 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
                 array = [i for i in tmp[key][1] if i >= 100]
                 plt.plot(list(range(len(array))), array,label=key)
                 
+        # Find days since 100th case and index match for population and population density
         if index == 1 or index == 2:
             
             for xCountry in list(data.keys()):
@@ -145,6 +213,7 @@ def plot_multi_countries(unique_countries, population, dataframe, yaxis = 'Confi
     if not daySince:
         plt.figure()
         ax = plt.gca()
+        #Format Date Axis for datetime objects
         formatter = mdates.DateFormatter("%Y-%m-%d")
         ax.xaxis.set_major_formatter(formatter)
         locator = mdates.DayLocator()
